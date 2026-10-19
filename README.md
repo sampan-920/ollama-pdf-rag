@@ -129,9 +129,32 @@ RAG 检索增强生成，让模型在回答前先"查资料"再作答
 
 ## 📄 项目文件说明
 ```
-.
-├── pdf_rag.py          # RAG主程序代码
-├── demo.pdf            # 知识库PDF文档（自行替换）
-├── chroma_pdf_db/      # Chroma向量数据库文件夹（自动生成）
-└── README.md           # 项目说明文档
+D:\AIProjects
+├─ streamlit_rag.py        # Streamlit网页版RAG主程序
+├─ pdf_rag_load.py         # 命令行版RAG（早期版本）
+├─ chroma_pdf_db/          # Chroma向量库（程序自动生成）
+├─ models/                 # 本地Embedding模型（可选，默认走缓存）
+├─ assets/
+│  ├─ rag_ui_home.png      # 网页首页截图
+│  └─ rag_answer_demo.png  # 问答演示截图
+├─ requirements.txt        # Python依赖
+└─ README.md               # 项目说明
 ```
+## 项目演示截图
+![RAG网页首页界面](assets/rag_ui_home.png)
+
+![RAG问答演示效果](assets/rag_answer_demo.png)
+
+
+## 📊 RAG系统量化评估
+尝试接入RAGAS库做自动评估，但LangChain生态迭代剧烈，内部模块大量迁移删除，出现连环版本冲突；即使新建独立隔离虚拟环境，依然难以对齐整套依赖。
+
+因此自研 **LLM-as-judge** 评估流水线，复用本地Qwen-4B作为裁判模型，实现RAG四大经典评估指标：
+1. `context_precision` 上下文准确率：检索文档与用户问题的相关程度
+2. `context_recall` 上下文召回率：检索片段是否覆盖回答所需全部信息
+3. `faithfulness` 答案忠实度：判断模型回答是否来源于检索上下文，衡量幻觉风险
+4. `answer_relevancy` 答案相关性：模型输出答案和用户提问的匹配程度
+
+> 说明：使用大模型作为裁判存在一定随机性，是LLM-as-judge方案的固有特点。
+评估代码：`rag_simple_eval.py`
+![RAG评估指标结果截图](assets/rag_eval_result.png)
